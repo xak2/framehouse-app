@@ -68,7 +68,6 @@ if ($_GET['action'] == 'load') {
         $response['success'] = true;
     }
 
-    $connect->close();
     echo json_encode($response);
     
 }

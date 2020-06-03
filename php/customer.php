@@ -11,4 +11,6 @@ if ($_GET['id']) {
     echo json_encode($response);
 }
 
+$connect->close();
+
 ?>

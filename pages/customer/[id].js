@@ -14,13 +14,42 @@ import {
     DetailsListLayoutMode,
     OverflowSet,
     CommandBarButton,
+    FontIcon,
+    getTheme,
+    mergeStyles,
+    mergeStyleSets,
     DetailsHeader,
     Selection,
     MarqueeSelection
 } from '@fluentui/react'
-import { Depths } from '@uifabric/fluent-theme'
+import Router from 'next/router'
 import moment from 'moment'
 import CreateProject from './create-project'
+
+const theme = getTheme();
+const classes = mergeStyleSets({
+    icon: {
+        fontSize: 16,
+        color: theme.palette.themePrimary,
+        verticalAlign: 'middle',
+        selectors: {
+            ':hover': {
+                color: '#00508A'
+            }
+        }
+    },
+    link: {
+        fontSize: 14,
+        color: theme.palette.themePrimary,
+        textDecoration: 'none',
+        selectors: {
+            ':hover': {
+                textDecoration: 'underline',
+                color: '#00508A'
+            }
+        }
+    }
+})
 
 class Customer extends React.Component {
 
@@ -30,20 +59,30 @@ class Customer extends React.Component {
         super(props)
         this.state = {
             id: this.props.router.query.id,
-            customer: ''
+            customer: '',
+            projects: []
         }
         this._columns = [
-            {
-                key: 'id',
-                name: 'Action',
-                fieldName: 'id',
-                minWidth: 10,
-                maxWidth: 50,
-                isResizable: false
-            },
-            { key: 'name', name: 'Name', fieldName: 'name', minWidth: 50, maxWidth: 200, isResizable: true },
-            { key: 'mail', name: 'Mail', fieldName: 'mail', minWidth: 50, isResizable: true }
+            { key: 'id', name: 'Action', fieldName: 'id', minWidth: 10, maxWidth: 50, isResizable: false },
+            { key: 'designation', name: 'Designation', fieldName: 'designation', minWidth: 100, maxWidth: 100, isResizable: false },
+            { key: 'name', name: 'Name', fieldName: 'name', minWidth: 50, isResizable: true },
+            { key: 'date_added', name: 'Date added', fieldName: 'date_added', minWidth: 120, maxWidth: 120, isResizable: true },
+            { key: 'date_modified', name: 'Last changes', fieldName: 'date_modified', minWidth: 120, maxWidth: 120, isResizable: true }
         ]
+    }
+
+    _updateData = () => {
+        var self = this
+        axios.get(`http://localhost/framehouse-app/php/customer.php?id=${this.state.id}`)
+            .then(function (response) {
+                self.setState({ customer: response.data })
+            })
+        axios.get(`http://localhost/framehouse-app/php/projects.php?load=${this.state.id}`)
+            .then(function (response) {
+                if (response.data !== null) {
+                    self.setState({ projects: response.data })
+                }
+            })
     }
 
     componentDidMount() {
@@ -55,9 +94,13 @@ class Customer extends React.Component {
                     self.setState({ customer: response.data })
                 }
             })
-            .catch(function (error) {
-                // handle error
-                console.log(error);
+        axios.get(`http://localhost/framehouse-app/php/projects.php?load=${this.state.id}`)
+            .then(function (response) {
+                if (self._isMounted) {
+                    if (response.data !== null) {
+                        self.setState({ projects: response.data })
+                    }
+                }
             })
     }
 
@@ -69,13 +112,31 @@ class Customer extends React.Component {
         if (item.onRender) {
             return item.onRender(item)
         }
-        if (item.key === 'create') return <CreateProject handler={this._updateCustomerList} />
-        else return <CommandBarButton iconProps={item.iconProps} text={item.text} onClick={item.onClick} />
+        if (item.key === 'create') return <CreateProject handler={this._updateData} cid={this.state.id} />
+        else return <CommandBarButton {...item} />
     }
 
     render() {
-        const { customer } = this.state
+        const { customer, projects } = this.state
         if (customer) {
+            let projectList
+            if (projects.length === 0) {
+                projectList = (
+                    <Stack styles={{ root: { textAlign: 'center', padding: 20 } }}><Text variant='large'>Nothing found</Text></Stack>
+                )
+            } else {
+                projectList = (
+                    <DetailsList
+                        items={projects}
+                        columns={this._columns}
+                        setKey="set2"
+                        onRenderItemColumn={renderItemColumn}
+                        layoutMode={DetailsListLayoutMode.justified}
+                        onItemInvoked={(item) => Router.push(`/project/${item.id}`)}
+                        selectionPreservedOnEmptyClick={false}
+                    />
+                )
+            }
             return (
                 <Layout>
                     <Stack>
@@ -120,28 +181,20 @@ class Customer extends React.Component {
                                     {
                                         key: 'create',
                                         text: 'Create project',
-                                        iconProps: { iconName: 'FabricNewFolder' },
-                                        onClick: () => console.log('add'),
+                                        iconProps: { iconName: 'FabricNewFolder' }
                                     },
                                     {
                                         key: 'delete',
                                         text: 'Delete project',
                                         iconProps: { iconName: 'Delete' },
+                                        disabled: true,
                                         onClick: () => console.log('remove'),
                                     }
                                 ]}
                                 onRenderItem={this._onRenderItem}
                             />
                         </Stack>
-                        <DetailsList
-                            items={[]}
-                            columns={this._columns}
-                            setKey="set2"
-                            layoutMode={DetailsListLayoutMode.justified}
-                            onItemInvoked={() => console.log('invoked')}
-                            selectionPreservedOnEmptyClick={false}
-                            styles={{ root: { boxShadow: Depths.depth4 } }}
-                        />
+                        {projectList}
                     </Stack>
                 </Layout>
             )
@@ -150,6 +203,20 @@ class Customer extends React.Component {
         }
     }
 
+}
+
+function renderItemColumn(item, index, column) {
+    const fieldContent = item[column.fieldName]
+    switch (column.key) {
+        case 'id': {
+            let link = '/project/' + fieldContent
+            return <a href={link}><FontIcon iconName="TrackersMirrored" className={classes.icon} /></a>
+        }
+        case 'name': return <span className={mergeStyles({ fontWeight: 'bold' })}>{fieldContent}</span>
+        case 'date_added': return <span>{moment.unix(fieldContent).format("DD.MM.YYYY H:m")}</span>
+        case 'date_modified': return <span>{moment.unix(fieldContent).format("DD.MM.YYYY H:m")}</span>
+        default: return <span>{fieldContent}</span>
+    }
 }
 
 export default withRouter(Customer)

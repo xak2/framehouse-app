@@ -98,7 +98,7 @@ export default class RemoveCustomer extends React.Component {
                         onChange={this._handleChange} label="Confirm with password" iconProps={{ iconName: 'PasswordField' }} />
                     <DialogFooter>
                         <PrimaryButton onClick={this._handleSubmit} iconProps={{ iconName: 'Delete' }} text="Remove" />
-                        <DefaultButton onClick={this._closeDialog} text="Cancel" />
+                        <DefaultButton onClick={this._closeDialog} iconProps={{ iconName: 'Cancel' }} text="Cancel" />
                     </DialogFooter>
                 </Dialog>
             </CommandBarButton>

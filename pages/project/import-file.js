@@ -8,6 +8,7 @@ import {
     DialogFooter,
     CommandBarButton,
     TextField,
+    Text,
     PrimaryButton,
     DefaultButton
 } from 'office-ui-fabric-react'
@@ -16,34 +17,34 @@ import { loadProgressBar } from 'axios-progress-bar'
 
 loadProgressBar()
 
-export default class AddCustomer extends React.Component {
+export default class ImportFile extends React.Component {
 
     constructor(props) {
         super(props)
-        this.state = { hideDialog: true, name: '', mail: '', error: undefined }
+        this.state = { hideDialog: true, name: '', designation: '', error: undefined }
     }
 
     _showDialog = () => { this.setState({ hideDialog: false }) }
-    _closeDialog = () => { this.setState({ hideDialog: true, name: '', mail: '', error: undefined }) }
+    _closeDialog = () => { this.setState({ hideDialog: true, name: '', designation: '', error: undefined }) }
     _handleChange = (event) => {
         const target = event.target
         const fieldValue = target.value
         const fieldName = target.name
         if (fieldName === 'name') this.setState({ name: fieldValue })
-        else if (fieldName === 'mail') this.setState({ mail: fieldValue })
+        else if (fieldName === 'designation') this.setState({ designation: fieldValue })
     }
     _handleSubmit = () => {
         var self = this
         axios.post(
-            'http://localhost/framehouse-app/php/customers.php?action=add',
-            { name: this.state.name, mail: this.state.mail },
+            'http://localhost/framehouse-app/php/projects.php?action=create',
+            { name: this.state.name, designation: this.state.designation, cid: this.props.cid },
             { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
         ).then((response) => {
+            console.log(response)
             if (response.data.error) {
                 self.setState({ error: response.data.error.join(' ') })
-            } else self.setState({ error: undefined })
-            if (response.data.success === true) {
-                self.setState({ hideDialog: true, name: '', mail: '' })
+            } else if (response.data.success === true) {
+                self.setState({ hideDialog: true, name: '', designation: '', error: undefined })
                 this.props.handler()
             }
         })
@@ -60,24 +61,21 @@ export default class AddCustomer extends React.Component {
         )
 
         return (
-            <CommandBarButton iconProps={{ iconName: 'AddFriend' }} text={'Add customer'} onClick={this._showDialog}>
+            <CommandBarButton iconProps={{ iconName: 'BuildQueueNew' }} text={'Create group'} onClick={this._showDialog} styles={{ root: { height: '44px' } }}>
                 <Dialog
                     hidden={hideDialog}
                     onDismiss={this._closeDialog}
                     dialogContentProps={{
                         type: DialogType.normal,
-                        title: 'Add new customer'
-                    }}
-                    modalProps={{
-                        isBlocking: false,
-                        styles: { main: { maxWidth: 450 } }
+                        title: 'Create group'
                     }}
                 >
                     {error ? ErrorBar : ''}
-                    <TextField name="name" onChange={this._handleChange} label="Customer or company name" iconProps={{ iconName: 'UserOptional' }} />
-                    <TextField name="mail" onChange={this._handleChange} label="Customer mail" iconProps={{ iconName: 'Mail' }} />
+                    <TextField name="name" onChange={this._handleChange} label="Group name" iconProps={{ iconName: 'Rename' }} />
+                    <Stack horizontal tokens={{ padding: '10px 0' }}><Text variant='medium' styles={{ root: { fontWeight: 600 } }}>Select single BVN or ASC file for import</Text></Stack>
+                    <input type="file" className="form-control" name="upload_file" onChange={this.handleInputChange} style={{ margin: '5px 0', fontSize: '14px', width: 300}} />
                     <DialogFooter>
-                        <PrimaryButton onClick={this._handleSubmit} iconProps={{ iconName: 'Save' }} text="Add" />
+                        <PrimaryButton onClick={this._handleSubmit} iconProps={{ iconName: 'CloudImportExport' }} text="Import" />
                         <DefaultButton onClick={this._closeDialog} iconProps={{ iconName: 'Cancel' }} text="Cancel" />
                     </DialogFooter>
                 </Dialog>
