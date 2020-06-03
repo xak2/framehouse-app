@@ -49,39 +49,6 @@ const classes = mergeStyleSets({
     }
 })
 
-/*
-function Test() {
-    const { data, revalidate } = useSWR('/api/customers', fetch, {
-        // revalidate the data per second
-        refreshInterval: 1000
-    })
-    const [value, setValue] = useState('')
-
-    if (!data) return <h1>loading...</h1>
-
-    return (
-        <div>
-            <h2>Todo List</h2>
-            <form onSubmit={async ev => {
-                ev.preventDefault()
-                setValue('')
-                await fetch(`/api/customers?add=${value}`)
-                revalidate()
-            }}>
-                <input placeholder='enter something' value={value} onChange={ev => setValue(ev.target.value)} />
-            </form>
-            <ul>
-                {data.map(item => <li key={item}>{item}</li>)}
-            </ul>
-            <DefaultButton text="Clear All" onClick={async () => {
-                await fetch(`/api/customers?clear=1`)
-                revalidate()
-            }} />
-        </div>
-    )
-}
-*/
-
 class CustomerList extends React.Component {
 
     constructor(props) {
