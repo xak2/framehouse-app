@@ -34,7 +34,6 @@ export default class ImportFile extends React.Component {
         const fieldName = target.name
         if (fieldName === 'name') this.setState({ name: fieldValue })
         else if (fieldName === 'upload_file') this.setState({ selectedFile: event.target.files[0] })
-        console.log(this.state)
     }
 
     _handleSubmit = () => {
@@ -46,20 +45,20 @@ export default class ImportFile extends React.Component {
         data.append('pid', this.props.pid)
 
         axios.post(
-            'http://localhost/framehouse-app/php/projects.php?action=create',
+            'http://localhost/framehouse-app/php/project.php?import=true',
             data,
             { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
         ).then((response) => {
             console.log(response)
-/*
+
             if (response.data.error) {
                 self.setState({ error: response.data.error.join(' ') })
             } else if (response.data.success === true) {
                 self.setState({ hideDialog: true, name: '', designation: '', error: undefined })
                 this.props.handler()
             }
-*/
         })
+
     }
 
     render() {
