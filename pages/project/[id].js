@@ -20,9 +20,47 @@ import {
     FontIcon,
     getTheme,
     mergeStyles,
-    mergeStyleSets
+    mergeStyleSets,
+    IconButton
 } from '@fluentui/react'
 import ImportFile from './import-file'
+
+const theme = getTheme();
+const classes = mergeStyleSets({
+    icon: {
+        fontSize: 16,
+        color: theme.palette.themePrimary,
+        verticalAlign: 'middle',
+        selectors: {
+            ':hover': {
+                color: '#00508A'
+            }
+        }
+    },
+    link: {
+        fontSize: 14,
+        color: theme.palette.themePrimary,
+        textDecoration: 'none',
+        selectors: {
+            ':hover': {
+                textDecoration: 'underline',
+                color: '#00508A'
+            }
+        }
+    },
+    columnStatus: {
+        textAlign: 'right',
+        padding: '5px 0 0 0 !important',
+        selectors: {
+            ':before': {
+                padding: '5px 0 0 0 !important'
+            },
+            ':after': {
+                padding: '5px 0 0 0 !important'
+            }
+        }
+    }
+})
 
 class Project extends React.Component {
 
@@ -35,14 +73,25 @@ class Project extends React.Component {
             project: ''
         }
         this._columns = [
-            { key: 'id', name: 'Action', fieldName: 'id', minWidth: 50, maxWidth: 50, isResizable: false },
-            { key: 'designation', name: 'Designation', fieldName: 'designation', minWidth: 100, maxWidth: 150, isResizable: false },
-            { key: 'ano', name: 'Anotation', fieldName: 'ano', minWidth: 100, isResizable: true },
-            { key: 'width', name: 'Width', fieldName: 'width', minWidth: 100, maxWidth: 150, isResizable: false },
-            { key: 'height', name: 'Height', fieldName: 'height', minWidth: 100, maxWidth: 150, isResizable: false },
-            { key: 'length', name: 'Length', fieldName: 'length', minWidth: 100, maxWidth: 150, isResizable: false },
-            { key: 'grossa', name: 'Gross area', fieldName: 'grossa', minWidth: 100, maxWidth: 150, isResizable: false },
-            { key: 'neta', name: 'Neto area', fieldName: 'neta', minWidth: 100, maxWidth: 150, isResizable: false }
+            //{ key: 'id', name: 'Action', fieldName: 'id', minWidth: 50, maxWidth: 50, isResizable: false },
+            { key: 'designation', name: 'Designation', fieldName: 'designation', minWidth: 100, maxWidth: 100, isResizable: false },
+            { key: 'width', name: 'Width', fieldName: 'width', minWidth: 50, maxWidth: 50, isResizable: false },
+            { key: 'height', name: 'Height', fieldName: 'height', minWidth: 50, maxWidth: 50, isResizable: false },
+            { key: 'length', name: 'Length', fieldName: 'length', minWidth: 50, maxWidth: 50, isResizable: false },
+            { key: 'grossa', name: 'Gross area', fieldName: 'grossa', minWidth: 70, maxWidth: 70, isResizable: false },
+            { key: 'neta', name: 'Neto area', fieldName: 'neta', minWidth: 70, maxWidth: 70, isResizable: false },
+            { key: 'comment', name: 'Comment', fieldName: 'comment', isResizable: false },
+            { key: 'status', name: 'Status', fieldName: 'status', minWidth: 45, maxWidth: 45, isResizable: false, className: classes.columnStatus }
+        ]
+        this._columns_bvn = [
+            //{ key: 'id', name: 'Action', fieldName: 'id', minWidth: 50, maxWidth: 50, isResizable: false },
+            { key: 'designation', name: 'Designation', fieldName: 'designation', minWidth: 100, maxWidth: 100, isResizable: false },
+            { key: 'width', name: 'Width', fieldName: 'width', minWidth: 50, maxWidth: 50, isResizable: false },
+            { key: 'height', name: 'Height', fieldName: 'height', minWidth: 50, maxWidth: 50, isResizable: false },
+            { key: 'length', name: 'Length', fieldName: 'length', minWidth: 50, maxWidth: 50, isResizable: false },
+            { key: 'quantity', name: 'Quantity', fieldName: 'quantity', minWidth: 70, maxWidth: 70, isResizable: false },
+            { key: 'comment', name: 'Comment', fieldName: 'comment', isResizable: false },
+            { key: 'status', name: 'Status', fieldName: 'status', minWidth: 90, maxWidth: 90, isResizable: false, className: classes.columnStatus }
         ]
         this.selection = new Selection({})
     }
@@ -80,18 +129,105 @@ class Project extends React.Component {
         else return <CommandBarButton {...item} />
     }
 
-    onRenderCell = (nestingDepth, item, itemIndex) => {
-        return (
-            <DetailsRow
-                columns={this._columns}
-                groupNestingDepth={nestingDepth}
-                item={item}
-                itemIndex={itemIndex}
-                selection={this.selection}
-                selectionMode={SelectionMode.multiple}
-            />
-        );
-    };
+    _renderItemColumn(item, index, column) {
+        const fieldContent = item[column.fieldName];
+
+        switch (column.key) {
+            case 'designation': {
+                return (
+                    <b>{item.designation}{item.ano}</b>
+                )
+            }
+            case 'status': {
+                const menuProps = {
+                    items: [
+                        {
+                            key: 'completed',
+                            text: 'Mark as completed',
+                            iconProps: { iconName: 'Completed' }
+                        },
+                        {
+                            key: 'calendarEvent',
+                            text: 'Mark as shiped',
+                            iconProps: { iconName: 'DeliveryTruck' }
+                        }
+                    ],
+                    directionalHintFixed: false
+                }
+                return (
+                    <IconButton
+                        menuProps={menuProps}
+                        iconProps={{ iconName: item.status == 'ready' ? "CompletedSolid" : "Processing" }}
+                        className={classes.icon}
+                    />
+                )
+            }
+            default:
+                return <span>{fieldContent}</span>
+        }
+    }
+
+    _renderItemColumnBvn(item, index, column) {
+        const fieldContent = item[column.fieldName];
+
+        switch (column.key) {
+            case 'designation': {
+                return (
+                    <b>{item.designation}{item.ano}</b>
+                )
+            }
+            case 'quantity': {
+                return (
+                    <>{item.finished} of {fieldContent}</>
+                )
+            }
+            case 'width': {
+                let width = fieldContent / 10
+                return width
+            }
+            case 'height': {
+                let height = fieldContent / 10
+                return height
+            }
+            case 'length': {
+                let length = fieldContent / 10
+                return length
+            }
+            case 'status': {
+                const menuProps = {
+                    items: [
+                        {
+                            key: 'completed',
+                            text: 'Mark as completed',
+                            iconProps: { iconName: 'Completed' }
+                        },
+                        {
+                            key: 'calendarEvent',
+                            text: 'Mark as shiped',
+                            iconProps: { iconName: 'DeliveryTruck' }
+                        }
+                    ],
+                    directionalHintFixed: false
+                }
+                console.log(`${item.finished} >= ${item.quantity}`)
+                return (
+                    <>
+                        <IconButton
+                            iconProps={{ iconName: "Info" }}
+                            className={classes.icon}
+                        />
+                        <IconButton
+                            menuProps={menuProps}
+                            iconProps={{ iconName: item.quantity > item.finished ? "Processing" : "CompletedSolid" }}
+                            className={classes.icon}
+                        />
+                    </>
+                )
+            }
+            default:
+                return <span>{fieldContent}</span>
+        }
+    }
 
     render() {
         console.log(this.state)
@@ -105,13 +241,32 @@ class Project extends React.Component {
             } else {
                 packingList = (
                     <DetailsList
-                    items={project.items}
-                    groups={project.groups}
-                    columns={this._columns}
-                    groupProps={{
-                      showEmptyGroups: true,
-                    }}
-                  />
+                        items={project.items}
+                        groups={project.groups}
+                        columns={this._columns}
+                        onRenderItemColumn={this._renderItemColumn}
+                        groupProps={{
+                            showEmptyGroups: true,
+                        }}
+                    />
+                )
+            }
+            let packingListParts
+            if (!project.groups_bvn) {
+                packingListParts = (
+                    <Stack styles={{ root: { textAlign: 'center', padding: 20 } }}><Text variant='large'>Nothing found</Text></Stack>
+                )
+            } else {
+                packingListParts = (
+                    <DetailsList
+                        items={project.items}
+                        groups={project.groups_bvn}
+                        columns={this._columns_bvn}
+                        onRenderItemColumn={this._renderItemColumnBvn}
+                        groupProps={{
+                            showEmptyGroups: true,
+                        }}
+                    />
                 )
             }
             return (
@@ -138,6 +293,7 @@ class Project extends React.Component {
                             />
                         </Stack>
                         {packingList}
+                        {packingListParts}
                     </Stack>
                 </Layout>
             )

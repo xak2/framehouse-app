@@ -13,7 +13,7 @@ const Index = () => {
   if (!user || user.isLoggedIn === false) {
     return <Layout><Spinner size={SpinnerSize.large} /></Layout>
   } else {
-    Router.push('/dashboard')
+    Router.push('/customers')
     return <Layout><Spinner size={SpinnerSize.large} /></Layout>
   }
   return ( <Layout><Spinner size={SpinnerSize.large} /></Layout> )

@@ -15,13 +15,6 @@ export default class MyApp extends App {
     return { pageProps }
   }
 
-  state = {
-    user: {
-      id: 2,
-      name: 'Vyacheslav Stefanovich'
-    }
-  }
-
   render() {
     const { Component, pageProps } = this.props
     return (

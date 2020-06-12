@@ -7,7 +7,7 @@ import fetchJson from '../lib/fetchJson'
 
 const Login = () => {
     const { mutateUser } = useUser({
-        redirectTo: '/dashboard',
+        redirectTo: '/customers',
         redirectIfFound: true,
     })
 
