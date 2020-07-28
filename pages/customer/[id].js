@@ -73,11 +73,11 @@ class Customer extends React.Component {
 
     _updateData = () => {
         var self = this
-        axios.get(`http://localhost/framehouse-app/php/customer.php?id=${this.state.id}`)
+        axios.get(`http://94.101.224.59/php/customer.php?id=${this.state.id}`)
             .then(function (response) {
                 self.setState({ customer: response.data })
             })
-        axios.get(`http://localhost/framehouse-app/php/projects.php?load=${this.state.id}`)
+        axios.get(`http://94.101.224.59/php/projects.php?load=${this.state.id}`)
             .then(function (response) {
                 if (response.data !== null) {
                     self.setState({ projects: response.data })
@@ -88,13 +88,13 @@ class Customer extends React.Component {
     componentDidMount() {
         var self = this
         self._isMounted = true
-        axios.get(`http://localhost/framehouse-app/php/customer.php?id=${this.state.id}`)
+        axios.get(`http://94.101.224.59/php/customer.php?id=${this.state.id}`)
             .then(function (response) {
                 if (self._isMounted) {
                     self.setState({ customer: response.data })
                 }
             })
-        axios.get(`http://localhost/framehouse-app/php/projects.php?load=${this.state.id}`)
+        axios.get(`http://94.101.224.59/php/projects.php?load=${this.state.id}`)
             .then(function (response) {
                 if (self._isMounted) {
                     if (response.data !== null) {

@@ -12,10 +12,17 @@ import {
     PrimaryButton,
     DefaultButton
 } from 'office-ui-fabric-react'
+import useUser from '../../lib/useUser'
 
 const axios = require('axios')
 
-export default class RemoveCustomer extends React.Component {
+const RemoveCustomer = (props) => {
+    const { user } = useUser()
+    return <RemoveCustomerComponent authUser={user} {...props} />
+}
+
+
+export class RemoveCustomerComponent extends React.Component {
 
     constructor(props) {
         super(props)
@@ -49,10 +56,10 @@ export default class RemoveCustomer extends React.Component {
     _handleSubmit = () => {
         var self = this
         const { customer } = this.state
-        const { user } = this.props
+        const { authUser } = this.props
         axios.post(
-            'http://localhost/framehouse-app/php/customers.php?action=remove',
-            { user_id: user.id, password: this.state.password, customer: customer },
+            'http://94.101.224.59/php/customers.php?action=remove',
+            { user_id: authUser.id, password: this.state.password, customer: customer },
             { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
         ).then((response) => {
             if (response.data.error) {
@@ -69,7 +76,6 @@ export default class RemoveCustomer extends React.Component {
     render() {
         const { customer, hideDialog, error } = this.state
         const { selectedCustomers } = this.props
-
         const ErrorBar = (
             <Stack horizontal tokens={{ childrenGap: 15 }} horizontalAlign="center">
                 <MessageBar messageBarType={MessageBarType.error} isMultiline={true}>
@@ -105,3 +111,5 @@ export default class RemoveCustomer extends React.Component {
         )
     }
 }
+
+export default RemoveCustomer

@@ -3,7 +3,9 @@
 header("Access-Control-Allow-Origin: *");
 error_reporting(0);
 
-$connect = new mysqli('mysqldb3.ehost-services.com', 'frame_xak2', 'stefan91', 'framehouse_housekeeper');
+include '_config.php';
+
+$connect = new mysqli($mysql_host, $mysql_user, $mysql_password, $mysql_db);
 
 if ($_GET['id']) {
     $result = $connect->query("select * from customers where id = '{$_GET['id']}'");

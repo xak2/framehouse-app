@@ -35,7 +35,7 @@ export default class CustomerDetails extends React.Component {
     _handleSubmit = () => {
         var self = this
         axios.post(
-            'http://localhost/framehouse-app/php/customers.php?action=add',
+            'http://94.101.224.59/php/customers.php?action=add',
             { name: this.state.name, mail: this.state.mail },
             { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
         ).then((response) => {

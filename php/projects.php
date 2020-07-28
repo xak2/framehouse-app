@@ -1,8 +1,9 @@
 <?php
 
-include '_config.php';
 header("Access-Control-Allow-Origin: *");
 error_reporting(0);
+
+include '_config.php';
 
 $connect = new mysqli($mysql_host, $mysql_user, $mysql_password, $mysql_db);
 
@@ -31,6 +32,7 @@ if ($_GET['action'] == 'create') {
     if (count($response['error']) == 0) {
         $time = time();
         $result = $connect->query("insert into projects (customer_id, name, designation, date_added, date_modified) values ('{$data['cid']}', '{$data['name']}', '{$data['designation']}', '{$time}', '{$time}')");
+        $response['sql'] = "insert into projects (customer_id, name, designation, date_added, date_modified) values ('{$data['cid']}', '{$data['name']}', '{$data['designation']}', '{$time}', '{$time}')";
         $response['success'] = true;
     }
 

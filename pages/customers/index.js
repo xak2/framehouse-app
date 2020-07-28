@@ -1,23 +1,18 @@
-// [bug] если после обновления списка клиентов использовать фильтр, используются начальные пропы
-// [mustd] доделать details
-
-import React, { setState, useState, useEffect } from 'react'
+import React from 'react'
 import moment from 'moment'
 import {
     DetailsList,
     DetailsListLayoutMode,
     Selection,
+    SelectionMode,
     MarqueeSelection,
     mergeStyles,
     mergeStyleSets,
     getTheme,
     OverflowSet,
     SearchBox,
-    initializeIcons,
-    FontIcon,
-    DefaultButton
+    FontIcon
 } from '@fluentui/react'
-import useSWR from 'swr'
 import fetch from '../../lib/fetchJson'
 import Layout from '../../components/Layout'
 import AddCustomer from './add'
@@ -104,6 +99,7 @@ class CustomerList extends React.Component {
                         setKey="set"
                         layoutMode={DetailsListLayoutMode.justified}
                         selection={this._selection}
+                        selectionMode={SelectionMode.single}
                         enterModalSelectionOnTouch={true}
                         onItemInvoked={this._onItemInvoked}
                         selectionPreservedOnEmptyClick={false}
@@ -114,7 +110,7 @@ class CustomerList extends React.Component {
     }
 
     async _updateCustomerList() {
-        const data = await fetch('http://localhost/framehouse-app/php/customers.php?action=load')
+        const data = await fetch('http://94.101.224.59/php/customers.php?action=load')
         return (
             this.setState({ items: data }),
             this._selection.setAllSelected(false)
@@ -174,7 +170,7 @@ function renderItemColumn(item, index, column) {
 }
 
 export async function getServerSideProps() {
-    const data = await fetch('http://localhost/framehouse-app/php/customers.php?action=load')
+    const data = await fetch('http://94.101.224.59/php/customers.php?action=load')
     return {
         props: { data }
     }

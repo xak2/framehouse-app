@@ -3,7 +3,7 @@ import withSession from '../../lib/session'
 
 export default withSession(async (req, res) => {
     const { username, password } = await req.body
-    const url = `http://localhost/framehouse-app/php/login.php?login=${username}&password=${password}`
+    const url = `http://94.101.224.59/php/login.php?login=${username}&password=${password}`
 
     try {
         // we check that the user exists on GitHub and store some data in session

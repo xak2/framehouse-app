@@ -1,9 +1,11 @@
 <?php
 
 header("Access-Control-Allow-Origin: *");
-error_reporting(0);
+//error_reporting(0);
 
-$connect = new mysqli('mysqldb3.ehost-services.com', 'frame_xak2', 'stefan91', 'framehouse_housekeeper');
+include '_config.php';
+
+$connect = new mysqli($mysql_host, $mysql_user, $mysql_password, $mysql_db);
 
 if ($_GET['action'] == 'load') {
 
@@ -42,6 +44,7 @@ if ($_GET['action'] == 'load') {
             $time = time();
             $result = $connect->query("insert into customers (name, mail, status, date_added, date_modified) values ('{$data['name']}', '{$data['mail']}', 'Just created', '{$time}', '{$time}')");
             $response['success'] = true;
+            $response['sql'] = "insert into customers (name, mail, status, date_added, date_modified) values ('{$data['name']}', '{$data['mail']}', 'Just created', '{$time}', '{$time}')";
         }
     
         echo json_encode($response);

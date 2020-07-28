@@ -35,7 +35,7 @@ export default class CreateProject extends React.Component {
     _handleSubmit = () => {
         var self = this
         axios.post(
-            'http://localhost/framehouse-app/php/projects.php?action=create',
+            'http://94.101.224.59/php/projects.php?action=create',
             { name: this.state.name, designation: this.state.designation, cid: this.props.cid },
             { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
         ).then((response) => {

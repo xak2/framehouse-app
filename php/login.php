@@ -1,14 +1,16 @@
 <?php
 
+include '_config.php';
+
 $login = $_GET['login'];
 $password = $_GET['password'];
 
 if ($login && $password) {
 
-    $conn = new mysqli('mysqldb3.ehost-services.com', 'frame_xak2', 'stefan91', 'framehouse_housekeeper');
-    $result = $conn->query("select * from users where login = '{$login}'");
+    $connect = new mysqli($mysql_host, $mysql_user, $mysql_password, $mysql_db);
+    $result = $connect->query("select * from users where login = '{$login}'");
     $user = $result->fetch_assoc();
-    $conn->close();
+    $connect->close();
 
     if ($login == $user['login'] && md5($password) == $user['password']) {
         $response['data'] = array(

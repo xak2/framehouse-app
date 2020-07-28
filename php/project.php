@@ -1,11 +1,12 @@
 <?php
 
-include '_config.php';
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: PUT, GET, POST");
 header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
 date_default_timezone_set('Europe/Riga');
 //error_reporting(0);
+
+include '_config.php';
 
 $connect = new mysqli($mysql_host, $mysql_user, $mysql_password, $mysql_db);
 
@@ -52,6 +53,7 @@ if ($_GET['load']) {
                 $finished = $result_finished->fetch_assoc();
                 $row_part['finished'] = (!$finished['count'] ? 0 : $finished['count']);
                 $row_part['finished_by'] = $finished['producer'];
+                $row_part['finished_at'] = date("Y-m-d H:i:s", $finished['date']);
                 $response['items'][] = $row_part;
             }
             $g++;
@@ -62,7 +64,6 @@ if ($_GET['load']) {
 
     }
 
-    $response['tmp'] = $tmp_wall;
     echo json_encode($response);
 
 } elseif ($_GET['import']) {
@@ -151,10 +152,12 @@ if ($_GET['load']) {
         if (count($response['error']) == 0) {
             $time = time();
             $result = $connect->query("insert into project_groups (project_id, name, position, type) values ('{$_POST['pid']}', '{$_POST['name']}', '{$time}', 'bvn')");
+            $response['sql'][] = $result;
             $id = $connect->query("select MAX(id) as last from project_groups");
             $id = $id->fetch_assoc();
             foreach ($items as $item) {
                 $result = $connect->query("insert into project_parts (group_id, designation, ano, quantity, height, width, length) values ('{$id['last']}', '{$item['designation']}', '{$item['ano']}', '{$item['quantity']}', '{$item['height']}', '{$item['width']}', '{$item['length']}')");
+                $response['sql'][] = $result;
             }
             $response['success'] = true;
         }

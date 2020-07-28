@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { withRouter } from 'next/router'
 import axios from 'axios'
 import Layout from '../../components/Layout'
@@ -17,7 +17,8 @@ import {
     DetailsRow,
     Selection,
     SelectionMode,
-    FontIcon,
+    TooltipHost,
+    DirectionalHint,
     getTheme,
     mergeStyles,
     mergeStyleSets,
@@ -35,7 +36,8 @@ const classes = mergeStyleSets({
             ':hover': {
                 color: '#00508A'
             }
-        }
+        },
+        height: '16px'
     },
     link: {
         fontSize: 14,
@@ -45,18 +47,6 @@ const classes = mergeStyleSets({
             ':hover': {
                 textDecoration: 'underline',
                 color: '#00508A'
-            }
-        }
-    },
-    columnStatus: {
-        textAlign: 'right',
-        padding: '5px 0 0 0 !important',
-        selectors: {
-            ':before': {
-                padding: '5px 0 0 0 !important'
-            },
-            ':after': {
-                padding: '5px 0 0 0 !important'
             }
         }
     }
@@ -81,40 +71,36 @@ class Project extends React.Component {
             { key: 'grossa', name: 'Gross area', fieldName: 'grossa', minWidth: 70, maxWidth: 70, isResizable: false },
             { key: 'neta', name: 'Neto area', fieldName: 'neta', minWidth: 70, maxWidth: 70, isResizable: false },
             { key: 'comment', name: 'Comment', fieldName: 'comment', isResizable: false },
-            { key: 'status', name: 'Status', fieldName: 'status', minWidth: 45, maxWidth: 45, isResizable: false, className: classes.columnStatus }
+            { key: 'status', name: 'Status', fieldName: 'status', minWidth: 90, maxWidth: 90, isResizable: false }
         ]
         this._columns_bvn = [
             //{ key: 'id', name: 'Action', fieldName: 'id', minWidth: 50, maxWidth: 50, isResizable: false },
             { key: 'designation', name: 'Designation', fieldName: 'designation', minWidth: 100, maxWidth: 100, isResizable: false },
+            { key: 'quantity', name: 'Quantity', fieldName: 'quantity', minWidth: 70, maxWidth: 70, isResizable: false },
             { key: 'width', name: 'Width', fieldName: 'width', minWidth: 50, maxWidth: 50, isResizable: false },
             { key: 'height', name: 'Height', fieldName: 'height', minWidth: 50, maxWidth: 50, isResizable: false },
-            { key: 'length', name: 'Length', fieldName: 'length', minWidth: 50, maxWidth: 50, isResizable: false },
-            { key: 'quantity', name: 'Quantity', fieldName: 'quantity', minWidth: 70, maxWidth: 70, isResizable: false },
+            { key: 'length', name: 'Length', fieldName: 'length', minWidth: 75, maxWidth: 75, isResizable: false },
             { key: 'comment', name: 'Comment', fieldName: 'comment', isResizable: false },
-            { key: 'status', name: 'Status', fieldName: 'status', minWidth: 90, maxWidth: 90, isResizable: false, className: classes.columnStatus }
+            { key: 'status', name: 'Status', fieldName: 'status', minWidth: 90, maxWidth: 90, isResizable: false }
         ]
         this.selection = new Selection({})
     }
 
     _updateData = () => {
         var self = this
-        axios.get(`http://localhost/framehouse-app/php/project.php?load=${this.state.id}`)
+        axios.get(`http://app.frame-house.eu/php/project.php?load=${this.state.id}`)
             .then(function (response) {
-                self.setState({ project: response.data })
+                if (self._isMounted) {
+                    console.log('Reloaded')
+                    self.setState({ project: response.data })
+                    self._updateData()
+                }
             })
     }
 
     componentDidMount() {
-        var self = this
-        self._isMounted = true
-        axios.get(`http://localhost/framehouse-app/php/project.php?load=${this.state.id}`)
-            .then(function (response) {
-                if (self._isMounted) {
-                    if (response.data !== null) {
-                        self.setState({ project: response.data })
-                    }
-                }
-            })
+        this._isMounted = true
+        this._updateData()
     }
 
     componentWillUnmount() {
@@ -178,20 +164,20 @@ class Project extends React.Component {
             }
             case 'quantity': {
                 return (
-                    <>{item.finished} of {fieldContent}</>
+                    <b>{item.finished} of {fieldContent}</b>
                 )
             }
             case 'width': {
                 let width = fieldContent / 10
-                return width
+                return `${width}mm`
             }
             case 'height': {
                 let height = fieldContent / 10
-                return height
+                return `${height}mm`
             }
             case 'length': {
                 let length = fieldContent / 10
-                return length
+                return `${length}mm`
             }
             case 'status': {
                 const menuProps = {
@@ -209,19 +195,15 @@ class Project extends React.Component {
                     ],
                     directionalHintFixed: false
                 }
-                console.log(`${item.finished} >= ${item.quantity}`)
+                //console.log(`${item.designation}${item.ano}: ${item.finished} < ${item.quantity}`)
                 return (
-                    <>
-                        <IconButton
-                            iconProps={{ iconName: "Info" }}
-                            className={classes.icon}
-                        />
+                    <TooltipHost content={item.finished_by == null ? 'Not finished' : `Finished by ${item.finished_by} at ${item.finished_at}`} directionalHint={DirectionalHint.leftCenter}>
                         <IconButton
                             menuProps={menuProps}
-                            iconProps={{ iconName: item.quantity > item.finished ? "Processing" : "CompletedSolid" }}
+                            iconProps={{ iconName: item.finished < item.quantity ? "Processing" : "CompletedSolid" }}
                             className={classes.icon}
                         />
-                    </>
+                    </TooltipHost>
                 )
             }
             default:
@@ -229,14 +211,29 @@ class Project extends React.Component {
         }
     }
 
+    _onRenderRow = props => {
+        const customStyles = {}
+        if (props) {
+            if (props.itemIndex % 2 === 0) {
+                customStyles.root = {
+                    backgroundColor: theme.palette.themeLighterAlt
+                }
+            }
+
+            return <DetailsRow {...props} styles={customStyles} />
+        }
+        return null
+    }
+
     render() {
-        console.log(this.state)
         const { project } = this.state
+        //console.log(project)
+        //console.log('re-render')
         if (project) {
             let packingList
             if (!project.groups) {
                 packingList = (
-                    <Stack styles={{ root: { textAlign: 'center', padding: 20 } }}><Text variant='large'>Nothing found</Text></Stack>
+                    <Stack styles={{ root: { textAlign: 'center', padding: 20 } }}><Text variant='large'>Walls not found</Text></Stack>
                 )
             } else {
                 packingList = (
@@ -245,6 +242,8 @@ class Project extends React.Component {
                         groups={project.groups}
                         columns={this._columns}
                         onRenderItemColumn={this._renderItemColumn}
+                        selectionMode={SelectionMode.none}
+                        onRenderRow={this._onRenderRow}
                         groupProps={{
                             showEmptyGroups: true,
                         }}
@@ -254,7 +253,7 @@ class Project extends React.Component {
             let packingListParts
             if (!project.groups_bvn) {
                 packingListParts = (
-                    <Stack styles={{ root: { textAlign: 'center', padding: 20 } }}><Text variant='large'>Nothing found</Text></Stack>
+                    <Stack styles={{ root: { textAlign: 'center', padding: 20 } }}><Text variant='large'>Single elements not found</Text></Stack>
                 )
             } else {
                 packingListParts = (
@@ -263,6 +262,8 @@ class Project extends React.Component {
                         groups={project.groups_bvn}
                         columns={this._columns_bvn}
                         onRenderItemColumn={this._renderItemColumnBvn}
+                        selectionMode={SelectionMode.none}
+                        onRenderRow={this._onRenderRow}
                         groupProps={{
                             showEmptyGroups: true,
                         }}
