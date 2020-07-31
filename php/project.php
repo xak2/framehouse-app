@@ -63,7 +63,8 @@ if ($_GET['load']) {
         $c = $c+$count['count'];
 
     }
-
+    // Задаем задержку воизбежания утечки памяти
+    sleep(3);
     echo json_encode($response);
 
 } elseif ($_GET['import']) {

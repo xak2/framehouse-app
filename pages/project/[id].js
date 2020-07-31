@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { withRouter } from 'next/router'
 import axios from 'axios'
 import Layout from '../../components/Layout'
@@ -7,20 +7,15 @@ import {
     Text,
     Spinner,
     SpinnerSize,
-    TextField,
-    CommandBar,
     DetailsList,
-    DetailsListLayoutMode,
     OverflowSet,
     CommandBarButton,
-    GroupedList,
     DetailsRow,
     Selection,
     SelectionMode,
     TooltipHost,
     DirectionalHint,
     getTheme,
-    mergeStyles,
     mergeStyleSets,
     IconButton
 } from '@fluentui/react'

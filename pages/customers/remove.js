@@ -12,15 +12,13 @@ import {
     PrimaryButton,
     DefaultButton
 } from 'office-ui-fabric-react'
+import axios from 'axios'
 import useUser from '../../lib/useUser'
-
-const axios = require('axios')
 
 const RemoveCustomer = (props) => {
     const { user } = useUser()
     return <RemoveCustomerComponent authUser={user} {...props} />
 }
-
 
 export class RemoveCustomerComponent extends React.Component {
 
@@ -58,7 +56,7 @@ export class RemoveCustomerComponent extends React.Component {
         const { customer } = this.state
         const { authUser } = this.props
         axios.post(
-            'http://94.101.224.59/php/customers.php?action=remove',
+            'http://app.frame-house.eu/php/customers.php?action=remove',
             { user_id: authUser.id, password: this.state.password, customer: customer },
             { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
         ).then((response) => {

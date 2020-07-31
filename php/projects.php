@@ -32,7 +32,10 @@ if ($_GET['action'] == 'create') {
     if (count($response['error']) == 0) {
         $time = time();
         $result = $connect->query("insert into projects (customer_id, name, designation, date_added, date_modified) values ('{$data['cid']}', '{$data['name']}', '{$data['designation']}', '{$time}', '{$time}')");
-        $response['sql'] = "insert into projects (customer_id, name, designation, date_added, date_modified) values ('{$data['cid']}', '{$data['name']}', '{$data['designation']}', '{$time}', '{$time}')";
+        $result = $connect->query("insert into activity
+            (user_id, activity, customer_id, timestamp)
+        values
+            ('{$data['user_id']}', 'has created project', '{$data['cid']}', '{$time}')");
         $response['success'] = true;
     }
 

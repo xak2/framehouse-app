@@ -17,14 +17,12 @@ import {
     FontIcon,
     getTheme,
     mergeStyles,
-    mergeStyleSets,
-    DetailsHeader,
-    Selection,
-    MarqueeSelection
+    mergeStyleSets
 } from '@fluentui/react'
 import Router from 'next/router'
 import moment from 'moment'
 import CreateProject from './create-project'
+import ActivityItemBasicExample from './activity'
 
 const theme = getTheme();
 const classes = mergeStyleSets({
@@ -143,7 +141,7 @@ class Customer extends React.Component {
                         <Stack tokens={{ padding: '0px 10px' }}>
                             <Text variant='xLarge'>{customer.name}</Text>
                         </Stack>
-                        <Stack horizontal tokens={{ childrenGap: 5, padding: 10 }}>
+                        <Stack horizontal tokens={{ childrenGap: 20, padding: 10 }}>
                             <Stack horizontal tokens={{ childrenGap: 10 }} styles={{ root: { width: '50%' } }}>
                                 <Stack.Item styles={{ root: { width: '50%' } }}>
                                     <Text variant='large'>Customer data</Text>
@@ -169,7 +167,7 @@ class Customer extends React.Component {
                             </Stack>
                             <Stack.Item styles={{ root: { width: '50%' } }}>
                                 <Text variant='large'>Last changes</Text>
-                                <Spinner size={SpinnerSize.medium} />
+                                <ActivityItemBasicExample cid={customer.id} />
                             </Stack.Item>
                         </Stack>
                         <Stack horizontal tokens={{ childrenGap: 5, padding: '10px 10px 0' }}>

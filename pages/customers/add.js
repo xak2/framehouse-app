@@ -13,10 +13,16 @@ import {
 } from 'office-ui-fabric-react'
 import axios from 'axios'
 import { loadProgressBar } from 'axios-progress-bar'
+import useUser from '../../lib/useUser'
 
 loadProgressBar()
 
-export default class AddCustomer extends React.Component {
+const AddCustomer = (props) => {
+    const { user } = useUser()
+    return <AddCustomerComponent authUser={user} {...props} />
+}
+
+export class AddCustomerComponent extends React.Component {
 
     constructor(props) {
         super(props)
@@ -34,13 +40,12 @@ export default class AddCustomer extends React.Component {
     }
     _handleSubmit = () => {
         var self = this
+        const { authUser } = this.props
         axios.post(
             'http://94.101.224.59/php/customers.php?action=add',
-            { name: this.state.name, mail: this.state.mail },
+            { user_id: authUser.id, name: this.state.name, mail: this.state.mail },
             { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
         ).then((response) => {
-            
-            console.log(response.data)
             if (response.data.error) {
                 self.setState({ error: response.data.error.join(' ') })
             } else self.setState({ error: undefined })
@@ -87,3 +92,5 @@ export default class AddCustomer extends React.Component {
         )
     }
 }
+
+export default AddCustomer

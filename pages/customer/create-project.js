@@ -13,10 +13,16 @@ import {
 } from 'office-ui-fabric-react'
 import axios from 'axios'
 import { loadProgressBar } from 'axios-progress-bar'
+import useUser from '../../lib/useUser'
 
 loadProgressBar()
 
-export default class CreateProject extends React.Component {
+const CreateProject = (props) => {
+    const { user } = useUser()
+    return <CreateProjectComponent authUser={user} {...props} />
+}
+
+export class CreateProjectComponent extends React.Component {
 
     constructor(props) {
         super(props)
@@ -34,9 +40,10 @@ export default class CreateProject extends React.Component {
     }
     _handleSubmit = () => {
         var self = this
+        const { authUser } = this.props
         axios.post(
             'http://94.101.224.59/php/projects.php?action=create',
-            { name: this.state.name, designation: this.state.designation, cid: this.props.cid },
+            { user_id: authUser.id, name: this.state.name, designation: this.state.designation, cid: this.props.cid },
             { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
         ).then((response) => {
             console.log(response)
@@ -85,3 +92,5 @@ export default class CreateProject extends React.Component {
         )
     }
 }
+
+export default CreateProject
