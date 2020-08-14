@@ -34,9 +34,9 @@ if ($_GET['action'] == 'load') {
                 ('{$data['name']}', '{$data['mail']}', 'Just created', '{$time}', '{$time}')");
 
             $result = $connect->query("insert into activity
-                (user_id, activity, customer_id, timestamp)
+                (user_id, activity, icon, customer_id, timestamp)
             values
-                ('{$data['user_id']}', 'has created customer', (SELECT MAX(id) FROM customers), '{$time}')");
+                ('{$data['user_id']}', 'has created customer', 'AddFriend', (SELECT MAX(id) FROM customers), '{$time}')");
                 
             $response['success'] = true;
         }
@@ -57,9 +57,9 @@ if ($_GET['action'] == 'load') {
     if (count($response['error']) == 0) {
         $result = $connect->query("update customers set removed = 'true' where id = '{$data['customer']['customerId']}'");
         $result = $connect->query("insert into activity
-            (user_id, activity, customer_id, timestamp)
+            (user_id, activity, icon, customer_id, timestamp)
         values
-            ('{$data['user_id']}', 'has removed customer', '{$data['customer']['customerId']}', '{$time}')");
+            ('{$data['user_id']}', 'has removed customer', 'Delete', '{$data['customer']['customerId']}', '{$time}')");
         $response['success'] = true;
     }
 

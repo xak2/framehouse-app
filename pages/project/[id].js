@@ -220,6 +220,20 @@ class Project extends React.Component {
         return null
     }
 
+    _onRenderGroupHeader = props => {
+        if (props) {
+            return (
+                <div>
+                    <div>{`Custom header for ${props.group.name}`} <TooltipHost content="Emoji">
+                        <IconButton iconProps={{ iconName: 'Emoji2' }} title="Emoji" />
+                    </TooltipHost>
+                    </div>
+                </div>
+            )
+        }
+        return null
+    }
+
     render() {
         const { project } = this.state
         //console.log(project)
@@ -257,10 +271,11 @@ class Project extends React.Component {
                         groups={project.groups_bvn}
                         columns={this._columns_bvn}
                         onRenderItemColumn={this._renderItemColumnBvn}
-                        selectionMode={SelectionMode.none}
+                        selectionMode={SelectionMode.multiple}
                         onRenderRow={this._onRenderRow}
                         groupProps={{
                             showEmptyGroups: true,
+                            //onRenderHeader: this._onRenderGroupHeader
                         }}
                     />
                 )

@@ -33,9 +33,9 @@ if ($_GET['action'] == 'create') {
         $time = time();
         $result = $connect->query("insert into projects (customer_id, name, designation, date_added, date_modified) values ('{$data['cid']}', '{$data['name']}', '{$data['designation']}', '{$time}', '{$time}')");
         $result = $connect->query("insert into activity
-            (user_id, activity, customer_id, timestamp)
+            (user_id, activity, icon, customer_id, timestamp)
         values
-            ('{$data['user_id']}', 'has created project', '{$data['cid']}', '{$time}')");
+            ('{$data['user_id']}', 'has created project', 'NewTeamProject', '{$data['cid']}', '{$time}')");
         $response['success'] = true;
     }
 

@@ -5,7 +5,7 @@ import axios from 'axios'
 
 const classNames = mergeStyleSets({
     exampleRoot: {
-        marginTop: '20px',
+        marginTop: '10px',
     },
     nameText: {
         fontWeight: 'bold',
@@ -25,7 +25,7 @@ class ActivityItemBasicExample extends React.Component {
             })
     }
     render() {
-        console.log(this.state.items)
+        //console.log(this.state.items)
         if (this.state.items) {
             return (
                 <div>
@@ -33,7 +33,7 @@ class ActivityItemBasicExample extends React.Component {
                         this.state.items.map((item) => (
                             <ActivityItem
                                 {...item}
-                                activityIcon={<Icon iconName={'AddFriend'} />}
+                                activityIcon={<Icon iconName={item.icon ? item.icon : 'Embed'} />}
                                 activityDescription={[
                                     <Link key={1} className={classNames.nameText} onClick={() => { alert('A name was clicked.') }}>{item.user_name}</Link>,
                                     <span key={2}> {item.activity} </span>,

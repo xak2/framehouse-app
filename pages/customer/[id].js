@@ -17,11 +17,15 @@ import {
     FontIcon,
     getTheme,
     mergeStyles,
-    mergeStyleSets
+    mergeStyleSets,
+    Selection,
+    SelectionMode
 } from '@fluentui/react'
 import Router from 'next/router'
 import moment from 'moment'
+
 import CreateProject from './create-project'
+import DeleteProject from './delete-project'
 import ActivityItemBasicExample from './activity'
 
 const theme = getTheme();
@@ -51,14 +55,14 @@ const classes = mergeStyleSets({
 
 class Customer extends React.Component {
 
-    _isMounted = false
-
     constructor(props) {
         super(props)
         this.state = {
             id: this.props.router.query.id,
-            customer: '',
-            projects: []
+            customer: undefined,
+            projects: [],
+            selected: [],
+            hddelete: true
         }
         this._columns = [
             { key: 'id', name: 'Action', fieldName: 'id', minWidth: 10, maxWidth: 50, isResizable: false },
@@ -67,10 +71,14 @@ class Customer extends React.Component {
             { key: 'date_added', name: 'Date added', fieldName: 'date_added', minWidth: 120, maxWidth: 120, isResizable: true },
             { key: 'date_modified', name: 'Last changes', fieldName: 'date_modified', minWidth: 120, maxWidth: 120, isResizable: true }
         ]
+        this._selection = new Selection({
+            onSelectionChanged: () => this.setState({ selected: this._selection.getSelection() })
+        })
     }
 
     _updateData = () => {
         var self = this
+        console.log('Data updated')
         axios.get(`http://94.101.224.59/php/customer.php?id=${this.state.id}`)
             .then(function (response) {
                 self.setState({ customer: response.data })
@@ -84,26 +92,7 @@ class Customer extends React.Component {
     }
 
     componentDidMount() {
-        var self = this
-        self._isMounted = true
-        axios.get(`http://94.101.224.59/php/customer.php?id=${this.state.id}`)
-            .then(function (response) {
-                if (self._isMounted) {
-                    self.setState({ customer: response.data })
-                }
-            })
-        axios.get(`http://94.101.224.59/php/projects.php?load=${this.state.id}`)
-            .then(function (response) {
-                if (self._isMounted) {
-                    if (response.data !== null) {
-                        self.setState({ projects: response.data })
-                    }
-                }
-            })
-    }
-
-    componentWillUnmount() {
-        this._isMounted = false
+        this._updateData()
     }
 
     _onRenderItem = (item) => {
@@ -115,7 +104,8 @@ class Customer extends React.Component {
     }
 
     render() {
-        const { customer, projects } = this.state
+        const { customer, projects, selected, hddelete } = this.state
+        //console.log(selected)
         if (customer) {
             let projectList
             if (projects.length === 0) {
@@ -131,6 +121,9 @@ class Customer extends React.Component {
                         onRenderItemColumn={renderItemColumn}
                         layoutMode={DetailsListLayoutMode.justified}
                         onItemInvoked={(item) => Router.push(`/project/${item.id}`)}
+                        selectionPreservedOnEmptyClick={false}
+                        selection={this._selection}
+                        selectionMode={SelectionMode.single}
                         selectionPreservedOnEmptyClick={false}
                     />
                 )
@@ -185,12 +178,13 @@ class Customer extends React.Component {
                                         key: 'delete',
                                         text: 'Delete project',
                                         iconProps: { iconName: 'Delete' },
-                                        disabled: true,
-                                        onClick: () => console.log('remove'),
+                                        disabled: selected.length !== 0 ? false : true,
+                                        onClick: () => this.setState({ hddelete: false })
                                     }
                                 ]}
                                 onRenderItem={this._onRenderItem}
                             />
+                            <DeleteProject hidden={hddelete} />
                         </Stack>
                         {projectList}
                     </Stack>
