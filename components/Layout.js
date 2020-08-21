@@ -4,7 +4,8 @@ import {
   Stack,
   DefaultPalette,
   mergeStyleSets,
-  initializeIcons
+  initializeIcons,
+  registerOnThemeChangeCallback
 } from 'office-ui-fabric-react'
 import { Depths } from '@uifabric/fluent-theme'
 import Head from 'next/head'

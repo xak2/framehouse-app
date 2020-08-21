@@ -100,6 +100,7 @@ class Customer extends React.Component {
             return item.onRender(item)
         }
         if (item.key === 'create') return <CreateProject handler={this._updateData} cid={this.state.id} />
+        else if (item.key === 'delete') return <DeleteProject selected={this.state.selected} handler={this._updateData} />
         else return <CommandBarButton {...item} />
     }
 
@@ -169,22 +170,11 @@ class Customer extends React.Component {
                         <Stack horizontal tokens={{ childrenGap: 5, padding: '0 10px' }}>
                             <OverflowSet
                                 items={[
-                                    {
-                                        key: 'create',
-                                        text: 'Create project',
-                                        iconProps: { iconName: 'FabricNewFolder' }
-                                    },
-                                    {
-                                        key: 'delete',
-                                        text: 'Delete project',
-                                        iconProps: { iconName: 'Delete' },
-                                        disabled: selected.length !== 0 ? false : true,
-                                        onClick: () => this.setState({ hddelete: false })
-                                    }
+                                    { key: 'create' },
+                                    { key: 'delete' }
                                 ]}
                                 onRenderItem={this._onRenderItem}
                             />
-                            <DeleteProject hidden={hddelete} />
                         </Stack>
                         {projectList}
                     </Stack>

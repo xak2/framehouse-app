@@ -1,4 +1,4 @@
-import React from 'react'
+import * as React from 'react'
 import {
     Stack,
     MessageBar,
@@ -13,43 +13,76 @@ import {
 } from 'office-ui-fabric-react'
 import axios from 'axios'
 import { loadProgressBar } from 'axios-progress-bar'
-import useUser from '../../lib/useUser'
 
-const DeleteProject = (props, handle) => {
+loadProgressBar()
 
+export class DeleteProject extends React.Component {
 
-    const _closeDialog = () => { console.log('dialog close') }
-
-    const _handleChange = (event) => { console.log('dialog change') }
-
-    const _handleSubmit = () => {
-        console.log(`Deletion submited`)
+    constructor(props) {
+        super(props)
+        this.state = { hideDialog: true, name: '', designation: '', error: undefined }
     }
 
+    _showDialog = () => { this.setState({ hideDialog: false }) }
+    _closeDialog = () => { this.setState({ hideDialog: true, name: '', designation: '', error: undefined }) }
+    _handleChange = (event) => {
+        const target = event.target
+        const fieldValue = target.value
+        const fieldName = target.name
+        if (fieldName === 'name') this.setState({ name: fieldValue })
+        else if (fieldName === 'designation') this.setState({ designation: fieldValue })
+    }
+    _handleSubmit = () => {
+        var self = this
+        const { authUser } = this.props
+        axios.post(
+            'http://94.101.224.59/php/projects.php?action=create',
+            { user_id: authUser.id, name: this.state.name, designation: this.state.designation, cid: this.props.cid },
+            { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+        ).then((response) => {
+            console.log(response)
+            if (response.data.error) {
+                self.setState({ error: response.data.error.join(' ') })
+            } else if (response.data.success === true) {
+                self.setState({ hideDialog: true, name: '', designation: '', error: undefined })
+                this.props.handler()
+            }
+        })
+    }
+
+    render() {
+        const { hideDialog } = this.state
+        const { selected } = this.props
+        //console.log(selected[0])
 
         return (
-            <Dialog
-                hidden={props.hidden}
-                onDismiss={_closeDialog}
-                dialogContentProps={{
-                    type: DialogType.normal,
-                    title: 'Delete project'
-                }}
-                modalProps={{
-                    isBlocking: false,
-                    styles: { main: { maxWidth: 450 } }
-                }}
+            <CommandBarButton
+                iconProps={{ iconName: 'Delete' }}
+                text={'Delete project'}
+                onClick={this._showDialog}
+                styles={{ root: { height: '44px' } }}
+                disabled={selected.length !== 0 ? false : true}
             >
-                <Text variant='mediumPlus'>Delete project ?</Text>
-                <TextField name="password" type="password" placeholder="Password"
-                    onChange={_handleChange} label="Confirm with password" iconProps={{ iconName: 'PasswordField' }} />
-                <DialogFooter>
-                    <PrimaryButton onClick={_handleSubmit} iconProps={{ iconName: 'Delete' }} text="Remove" />
-                    <DefaultButton onClick={_closeDialog} iconProps={{ iconName: 'Cancel' }} text="Cancel" />
-                </DialogFooter>
-            </Dialog>
+                <Dialog
+                    hidden={hideDialog}
+                    onDismiss={this._closeDialog}
+                    dialogContentProps={{
+                        type: DialogType.normal
+                    }}
+                    modalProps={{
+                        isBlocking: false,
+                        styles: { main: { minWidth: 450, maxWidth: 450 } }
+                    }}
+                >
+                    <Stack>Are you sure you want to delete project <b>{selected[0] ? selected[0].name : undefined }</b>?</Stack>
+                    <DialogFooter>
+                        <PrimaryButton onClick={this._handleSubmit} iconProps={{ iconName: 'Delete' }} text="Yes" />
+                        <DefaultButton onClick={this._closeDialog} iconProps={{ iconName: 'Cancel' }} text="No" />
+                    </DialogFooter>
+                </Dialog>
+            </CommandBarButton>
         )
- 
+    }
 }
 
 export default DeleteProject

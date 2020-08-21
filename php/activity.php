@@ -21,7 +21,7 @@ if ($_GET['cid']) {
         and users.id = activity.user_id
         and customers.id = activity.customer_id
     order by timestamp
-    asc limit 5");
+    desc limit 5");
     while ($row = $result->fetch_assoc()) { $response[] = $row; }
     echo json_encode($response);
 

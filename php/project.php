@@ -71,6 +71,11 @@ if ($_GET['load']) {
 
     // $_FILES (file)
     $file = $_FILES['file'];
+    // Debug file
+    //$file = array(
+    //    'name' => 'debugasc.asc',
+    //    'tmp_name' => 'debugasc.asc'
+    //);
     // $_POST (name, pid)
 
     $file_ext = strtolower(end(explode('.', $file['name'])));
@@ -110,12 +115,16 @@ if ($_GET['load']) {
 
         if (count($response['error']) == 0) {
             $time = time();
-            $result = $connect->query("insert into project_groups (project_id, name, position, type) values ('{$_POST['pid']}', '{$_POST['name']}', '{$time}', 'asc')");
+            $result = $connect->query("INSERT into project_groups
+                (project_id, name, position, type) 
+            values
+                ('{$_POST['pid']}', '{$_POST['name']}', '{$time}', 'asc')");
             $id = $connect->query("select MAX(id) as last from project_groups");
             $id = $id->fetch_assoc();
             foreach ($rows as $entry) {
+                $entry['designation'] ? $designation = $entry['designation'] : $designation = $entry['tot'];
                 $entry['ano'] = (int)$entry['ano'];
-                $result = $connect->query("insert into project_walls (group_id, designation, ano, grossa, height, length, neta, width) values ('{$id['last']}', '{$entry['designation']}', '{$entry['ano']}', '{$entry['grossa']}', '{$entry['height']}', '{$entry['length']}', '{$entry['neta']}', '{$entry['width']}')");
+                $result = $connect->query("insert into project_walls (group_id, designation, ano, grossa, height, length, neta, width) values ('{$id['last']}', '{$designation}', '{$entry['ano']}', '{$entry['grossa']}', '{$entry['height']}', '{$entry['length']}', '{$entry['neta']}', '{$entry['width']}')");
             }
             $response['success'] = true;
         }
@@ -125,6 +134,8 @@ if ($_GET['load']) {
         $source = file_get_contents($file['tmp_name']);
         $source = explode("\n", $source);
         $source = array_slice($source, 1, -1);
+
+        //print_r($source);
 
         if (strlen($_POST['name']) < 5) {
             $response['error'][] = 'Group name must be from 5 to 30 chars.';

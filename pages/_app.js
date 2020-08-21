@@ -1,9 +1,12 @@
 import React from 'react'
 import App from 'next/app'
+import { Provider } from 'react-redux'
 import { SWRConfig } from 'swr'
 import fetch from '../lib/fetchJson'
+import withRedux from 'next-redux-wrapper'
+import store from '../redux/store'
 
-export default class MyApp extends App {
+export class MyApp extends App {
 
   static async getInitialProps({ Component, router, ctx }) {
     let pageProps = {}
@@ -26,8 +29,14 @@ export default class MyApp extends App {
           },
         }}
       >
-        <Component {...pageProps} {...this.state} />
+        <Provider store={store}>
+          <Component {...pageProps} {...this.state} />
+        </Provider>
       </SWRConfig>
     )
   }
 }
+
+const makeStore = () => store
+
+export default withRedux(makeStore)(MyApp)

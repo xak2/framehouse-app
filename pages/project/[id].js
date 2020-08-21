@@ -20,6 +20,9 @@ import {
     IconButton
 } from '@fluentui/react'
 import ImportFile from './import-file'
+import { connect } from 'react-redux'
+import { setNavigation } from '../redux/actions/projectActions'
+
 
 const theme = getTheme();
 const classes = mergeStyleSets({
@@ -86,7 +89,7 @@ class Project extends React.Component {
         axios.get(`http://app.frame-house.eu/php/project.php?load=${this.state.id}`)
             .then(function (response) {
                 if (self._isMounted) {
-                    console.log('Reloaded')
+                    console.log('Project data updated')
                     self.setState({ project: response.data })
                     self._updateData()
                 }
@@ -179,11 +182,20 @@ class Project extends React.Component {
                     items: [
                         {
                             key: 'completed',
-                            text: 'Mark as completed',
-                            iconProps: { iconName: 'Completed' }
+                            text: 'Mark one as completed',
+                            iconProps: { iconName: 'Completed' },
+                            onClick: () => console.log('Clicked one'),
+                            disabled: (item.quantity - item.finished >= 1 ? false : true)
                         },
                         {
-                            key: 'calendarEvent',
+                            key: 'completedAll',
+                            text: 'Mark all as completed',
+                            iconProps: { iconName: 'ReceiptCheck' },
+                            onClick: () => console.log('Clicked all'),
+                            disabled: (item.quantity - item.finished > 1 ? false : true)
+                        },
+                        {
+                            key: 'shiped',
                             text: 'Mark as shiped',
                             iconProps: { iconName: 'DeliveryTruck' }
                         }

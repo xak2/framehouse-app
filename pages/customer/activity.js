@@ -1,7 +1,9 @@
-import React, { setState } from 'react'
+import React from 'react'
 import { ActivityItem, Icon, Link, mergeStyleSets, Spinner, SpinnerSize } from 'office-ui-fabric-react'
 import moment from 'moment'
 import axios from 'axios'
+
+var parse = require('html-react-parser')
 
 const classNames = mergeStyleSets({
     exampleRoot: {
@@ -24,8 +26,13 @@ class ActivityItemBasicExample extends React.Component {
                 self.setState({ items: response.data })
             })
     }
+    stringToHTML = function (str) {
+        var dom = document.createElement('span');
+        dom.innerHTML = str;
+        return dom;
+    }
     render() {
-        //console.log(this.state.items)
+        console.log(this.state.items)
         if (this.state.items) {
             return (
                 <div>
@@ -36,7 +43,7 @@ class ActivityItemBasicExample extends React.Component {
                                 activityIcon={<Icon iconName={item.icon ? item.icon : 'Embed'} />}
                                 activityDescription={[
                                     <Link key={1} className={classNames.nameText} onClick={() => { alert('A name was clicked.') }}>{item.user_name}</Link>,
-                                    <span key={2}> {item.activity} </span>,
+                                    <span key={2}> {parse(item.activity)} </span>,
                                     <span key={3} className={classNames.nameText}>{item.customer_name}</span>
                                 ]}
                                 key={item.id}

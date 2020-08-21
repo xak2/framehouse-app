@@ -32,10 +32,12 @@ if ($_GET['action'] == 'create') {
     if (count($response['error']) == 0) {
         $time = time();
         $result = $connect->query("insert into projects (customer_id, name, designation, date_added, date_modified) values ('{$data['cid']}', '{$data['name']}', '{$data['designation']}', '{$time}', '{$time}')");
+        $result = $connect->query("SELECT name FROM projects ORDER BY date_added DESC LIMIT 1");
+        $last_row = $result->fetch_assoc();
         $result = $connect->query("insert into activity
             (user_id, activity, icon, customer_id, timestamp)
         values
-            ('{$data['user_id']}', 'has created project', 'NewTeamProject', '{$data['cid']}', '{$time}')");
+            ('{$data['user_id']}', 'has created project <b>{$last_row['name']}</b> for customer ', 'NewTeamProject', '{$data['cid']}', '{$time}')");
         $response['success'] = true;
     }
 
