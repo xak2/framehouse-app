@@ -123,7 +123,7 @@ if ($_GET['load']) {
             $id = $id->fetch_assoc();
             foreach ($rows as $entry) {
                 $entry['designation'] ? $designation = $entry['designation'] : $designation = $entry['tot'];
-                $entry['ano'] = (int)$entry['ano'];
+                //$entry['ano'] = (int)$entry['ano'];
                 $result = $connect->query("insert into project_walls (group_id, designation, ano, grossa, height, length, neta, width) values ('{$id['last']}', '{$designation}', '{$entry['ano']}', '{$entry['grossa']}', '{$entry['height']}', '{$entry['length']}', '{$entry['neta']}', '{$entry['width']}')");
             }
             $response['success'] = true;

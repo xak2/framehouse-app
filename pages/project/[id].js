@@ -21,7 +21,7 @@ import {
 } from '@fluentui/react'
 import ImportFile from './import-file'
 import { connect } from 'react-redux'
-import { setNavigation } from '../redux/actions/projectActions'
+import { setNavigation } from '../../redux/actions/projectActions'
 
 
 const theme = getTheme();
@@ -263,7 +263,7 @@ class Project extends React.Component {
                         groups={project.groups}
                         columns={this._columns}
                         onRenderItemColumn={this._renderItemColumn}
-                        selectionMode={SelectionMode.none}
+                        selectionMode={SelectionMode.multiple}
                         onRenderRow={this._onRenderRow}
                         groupProps={{
                             showEmptyGroups: true,
