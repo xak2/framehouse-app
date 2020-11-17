@@ -33,6 +33,11 @@ if ($_GET['load']) {
     
             $result_walls = $connect->query("select * from project_walls where group_id = '{$row_group['id']}'");
             while ($row_wall = $result_walls->fetch_assoc()) {
+                $result_finished = $connect->query("SELECT *, SUM(quantity) AS count FROM `sawinglist` WHERE `name` LIKE '{$row_wall['designation']}{$row_wall['ano']}%'");
+                $finished = $result_finished->fetch_assoc();
+                $row_wall['finished'] = (!$finished['count'] ? 0 : $finished['count']);
+                $row_wall['finished_by'] = $finished['producer'];
+                $row_wall['finished_at'] = date("Y-m-d H:i:s", $finished['date']);
                 $response['items'][] = $row_wall;
             }
             $i++;
@@ -124,7 +129,8 @@ if ($_GET['load']) {
             foreach ($rows as $entry) {
                 $entry['designation'] ? $designation = $entry['designation'] : $designation = $entry['tot'];
                 //$entry['ano'] = (int)$entry['ano'];
-                $result = $connect->query("insert into project_walls (group_id, designation, ano, grossa, height, length, neta, width) values ('{$id['last']}', '{$designation}', '{$entry['ano']}', '{$entry['grossa']}', '{$entry['height']}', '{$entry['length']}', '{$entry['neta']}', '{$entry['width']}')");
+                $ano = str_replace("'", '', $entry['ano']);
+                $result = $connect->query("insert into project_walls (group_id, designation, ano, grossa, height, length, neta, width) values ('{$id['last']}', '{$designation}', '{$ano}', '{$entry['grossa']}', '{$entry['height']}', '{$entry['length']}', '{$entry['neta']}', '{$entry['width']}')");
             }
             $response['success'] = true;
         }

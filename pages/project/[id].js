@@ -63,6 +63,7 @@ class Project extends React.Component {
         this._columns = [
             //{ key: 'id', name: 'Action', fieldName: 'id', minWidth: 50, maxWidth: 50, isResizable: false },
             { key: 'designation', name: 'Designation', fieldName: 'designation', minWidth: 100, maxWidth: 100, isResizable: false },
+            { key: 'finished', name: 'Finished', fieldName: 'finished', minWidth: 70, maxWidth: 70, isResizable: false },
             { key: 'width', name: 'Width', fieldName: 'width', minWidth: 50, maxWidth: 50, isResizable: false },
             { key: 'height', name: 'Height', fieldName: 'height', minWidth: 50, maxWidth: 50, isResizable: false },
             { key: 'length', name: 'Length', fieldName: 'length', minWidth: 50, maxWidth: 50, isResizable: false },
@@ -73,7 +74,7 @@ class Project extends React.Component {
         ]
         this._columns_bvn = [
             //{ key: 'id', name: 'Action', fieldName: 'id', minWidth: 50, maxWidth: 50, isResizable: false },
-            { key: 'designation', name: 'Designation', fieldName: 'designation', minWidth: 100, maxWidth: 100, isResizable: false },
+            { key: 'designation', name: 'Designation', fieldName: 'designation', minWidth: 100, maxWidth: 100, isResizable: false, isSorted: true, isSortedDescending: false },
             { key: 'quantity', name: 'Quantity', fieldName: 'quantity', minWidth: 70, maxWidth: 70, isResizable: false },
             { key: 'width', name: 'Width', fieldName: 'width', minWidth: 50, maxWidth: 50, isResizable: false },
             { key: 'height', name: 'Height', fieldName: 'height', minWidth: 50, maxWidth: 50, isResizable: false },
@@ -122,6 +123,20 @@ class Project extends React.Component {
                     <b>{item.designation}{item.ano}</b>
                 )
             }
+            case 'finished': {
+                return (
+                    <b>{item.finished}</b>
+                )
+            }
+            case 'width': {
+                return `${fieldContent}mm`
+            }
+            case 'height': {
+                return `${fieldContent}mm`
+            }
+            case 'length': {
+                return `${fieldContent}mm`
+            }
             case 'status': {
                 const menuProps = {
                     items: [
@@ -139,11 +154,13 @@ class Project extends React.Component {
                     directionalHintFixed: false
                 }
                 return (
-                    <IconButton
-                        menuProps={menuProps}
-                        iconProps={{ iconName: item.status == 'ready' ? "CompletedSolid" : "Processing" }}
-                        className={classes.icon}
-                    />
+                    <TooltipHost content={item.finished_by == null ? 'Not finished' : `Finished ${item.finished} parts by ${item.finished_by} at ${item.finished_at}`} directionalHint={DirectionalHint.leftCenter}>
+                        <IconButton
+                            menuProps={menuProps}
+                            iconProps={{ iconName: item.finished < 3 ? "Processing" : "CompletedSolid" }}
+                            className={classes.icon}
+                        />
+                    </TooltipHost>
                 )
             }
             default:
@@ -249,7 +266,6 @@ class Project extends React.Component {
     render() {
         const { project } = this.state
         //console.log(project)
-        //console.log('re-render')
         if (project) {
             let packingList
             if (!project.groups) {
