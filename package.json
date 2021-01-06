@@ -10,7 +10,7 @@
   "dependencies": {
     "@fluentui/react": "^7.109.0",
     "@uifabric/fluent-theme": "^7.1.75",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "axios-progress-bar": "^1.2.0",
     "fetch": "^1.1.0",
     "html-react-parser": "^0.13.0",
